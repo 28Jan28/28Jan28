@@ -1,0 +1,22 @@
+0010390011 - vjan
+0010390012 - blja
+0010390013 - vond
+0010390014 - amja
+0010390015 - heid
+0010390016 - lusk
+
+cd C:\Users\blja\Desktop\GITHUB
+
+node server.js
+
+node serverManager.js
+
+curl -X POST http://localhost:3000/users -H "Content-Type: application/json" -d "{\"name\": \"User1\", \"rfid\": \"0010390011\", \"credit\": 100}"
+
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Jan Vydra\", \"rfid\": \"0010390011\", \"credit\": 100}"
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Jan Blažek\", \"rfid\": \"0010390012\", \"credit\": 100}"
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Ondřej Vozka\", \"rfid\": \"0010390013\", \"credit\": 100}"
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Jan Žambera\", \"rfid\": \"0010390014\", \"credit\": 100}"
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Michal Heidlas\", \"rfid\": \"0010390015\", \"credit\": 100}"
+curl -X POST http://localhost:3001/users -H "Content-Type: application/json" -d "{\"name\": \"Martina Lusková\", \"rfid\": \"0010390016\", \"credit\": 100}"
+

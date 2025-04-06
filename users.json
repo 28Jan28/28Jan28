@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Jan Vydra",
+    "rfid": "0010390011",
+    "credit": 100
+  },
+  {
+    "name": "Jan Blažek",
+    "rfid": "0046584111",
+    "credit": 995
+  },
+  {
+    "name": "Ondřej Vozka",
+    "rfid": "0010390013",
+    "credit": 150
+  },
+  {
+    "name": "Jan Žambera",
+    "rfid": "0010390014",
+    "credit": 250
+  },
+  {
+    "name": "Michal Heidlas",
+    "rfid": "0010390015",
+    "credit": 50
+  },
+  {
+    "name": "Martina Lusková",
+    "rfid": "0010390016",
+    "credit": 400
+  }
+]

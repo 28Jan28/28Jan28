@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kávový automat SFS Group CZ</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://profesprojekt.cz/wp-content/uploads/2016/05/sfs-intec-1.jpg') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0.5;
+            z-index: -1;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            z-index: 1;
+        }
+        .datetime {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1;
+        }
+        .container, .user-list {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 20%;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .container {
+            left: 2cm;
+        }
+        .user-list {
+            right: 2cm;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .container p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        .container input[type="text"], .container input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .container input[type="text"] {
+            autocomplete: off;
+        }
+        .container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .container button:first-of-type {
+            background-color: #4CAF50;
+        }
+        .container button:last-of-type {
+            background-color: #2196F3;
+        }
+        .container button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .user-list h2 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .user-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .user-list table, .user-list th, .user-list td {
+            border: 1px solid #ddd;
+        }
+        .user-list th, .user-list td {
+            padding: 12px;
+            text-align: left;
+            font-size: 16px;
+            color: #333;
+        }
+        .user-list .negative-credit {
+            color: red;
+            font-weight: bold;
+        }
+        .user-list td button {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .credit-input-container {
+            display: none;
+            margin-top: 10px;
+        }
+        /* Styl pro zobrazení obrázku a textu po odběru kávy */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 4;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .overlay img {
+            width: 400px;
+            height: auto;
+        }
+        .overlay p {
+            font-size: 24px;
+            color: #fff;
+        }
+        .credit-display .success-text {
+            font-size: 24px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-image"></div>
+    <div class="datetime" id="datetime"></div>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/SFS_Group_logo.svg/1200px-SFS_Group_logo.svg.png" alt="Company Logo" class="logo">
+    <div class="container">
+        <h1>Vítejte u kávového automatu na oddělení QM</h1>
+        <p>Přiložte svou RFID kartu k čtečce a stiskněte tlačítko níže pro výdej kávy nebo dobití kreditu.</p>
+        <input type="text" id="rfid" placeholder="Přiložte kartu" autocomplete="off" />
+        <div>
+            <button onclick="dispenseCoffee()">Vydat kávu</button>
+            <button onclick="showCreditInput()">Dobít kredit</button>
+        </div>
+        <div class="credit-input-container" id="creditInputContainer">
+            <input type="number" id="creditAmount" placeholder="Částka v Kč" />
+            <button onclick="addCredit()">Potvrdit</button>
+        </div>
+        <p id="message" class="message"></p>
+    </div>
+    <div class="user-list">
+        <h2>Seznam uživatelů</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Jméno</th>
+                    <th>Kredit</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Zobrazení obrázku a textu po odběru kávy -->
+    <div class="overlay" id="coffeeDisplay" style="display: none;">
+        <div>
+            <img src="C:/Users/blja/Desktop/GITHUB/png-clipart-coffee-cup-mug-coffee-purple-food.png" alt="Coffee Image">
+            <p>Odběr kávy proběhl</p>
+        </div>
+    </div>
+    <!-- Zobrazení obrázku po dobití kreditu -->
+    <div class="overlay" id="creditDisplay" style="display: none;">
+        <div>
+            <img src="C:/Users/blja/Desktop/GITHUB/penize-koruna-euro-dolar-libra-shekel-2.jpg" alt="Credit Image">
+            <p class="success-text">Dobití kreditu proběhlo úspěšně.</p>
+        </div>
+    </div>
+
+    <script>
+        // Automaticky zaměří vstupní pole po načtení stránky
+        window.onload = function() {
+            document.getElementById('rfid').focus();
+            fetchUsers();
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Aktualizace každou sekundu
+        };
+
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeString = now.toLocaleString();
+            document.getElementById('datetime').textContent = dateTimeString;
+        }
+
+        function clearRFIDInput() {
+            document.getElementById('rfid').value = '';
+            document.getElementById('rfid').focus();
+        }
+
+        function dispenseCoffee() {
+            const rfid = document.getElementById('rfid').value;
+            console.log(`Sending RFID: ${rfid}`);
+            fetch('http://localhost:3001/coffee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ rfid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = document.getElementById('message');
+                if(data.error) {
+                    message.textContent = `Error: ${data.error}`;
+                    message.style.color = 'red';
+                } else {
+                    message.textContent = `Káva byla vydána! Transakční ID: ${data.transactionId}`;
+                    message.style.color = 'green';
+                    fetchUsers(); // Aktualizuje seznam uživatelů po výdeji kávy
+                    showCoffeeDisplay();
+                }
+                clearRFIDInput();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                clearRFIDInput();
+            });
+        }
+
+        function showCreditInput() {
+            const creditInputContainer = document.getElementById('creditInputContainer');
+            creditInputContainer.style.display = 'block';
+            document.getElementById('creditAmount').focus();
+        }
+
+        function addCredit() {
+            const rfid = document.getElementById('rfid').value;
+            const amount = document.getElementById('creditAmount').value;
+            console.log(`Adding credit: ${amount} to RFID: ${rfid}`);
+            fetch(`http://localhost:3001/users/${rfid}/credit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount: parseInt(amount) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = document.getElementById('message');
+                if(data.error) {
+                    message.textContent = `Error: ${data.error}`;
+                    message.style.color = 'red';
+                } else {
+                    message.textContent = `Kredit byl úspěšně navýšen! Nový kredit: ${data.newCredit} Kč`;
+                    message.style.color = 'green';
+                    fetchUsers(); // Aktualizuje seznam uživatelů po dobití kreditu
+                    showCreditDisplay();
+                }
+                document.getElementById('creditInputContainer').style.display = 'none';
+                document.getElementById('creditAmount').value = '';
+                clearRFIDInput();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                clearRFIDInput();
+            });
+        }
+
+        function deleteUser(rfid) {
+            const pin = prompt("Prosím, zadejte PIN pro potvrzení smazání:");
+            if (pin === "0046584111") {
+                console.log(`Deleting user with RFID: ${rfid}`);
+                fetch(`http://localhost:3001/users/${rfid}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const message = document.getElementById('message');
+                    if (data.error) {
+                        message.textContent = `Error: ${data.error}`;
+                        message.style.color = 'red';
+                    } else {
+                        message.textContent = `Uživatel byl úspěšně smazán!`;
+                        message.style.color = 'green';
+                        fetchUsers(); // Aktualizuje seznam uživatelů po smazání uživatele
+                    }
+                    clearRFIDInput();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearRFIDInput();
+                });
+            } else {
+                alert("Neplatný PIN! Smazání zrušeno.");
+                clearRFIDInput();
+            }
+        }
+
+        function fetchUsers() {
+            fetch('http://localhost:3001/users')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched users:', data); // Přidáno pro kontrolu výstupu v konzoli
+                const userTableBody = document.getElementById('userTableBody');
+                userTableBody.innerHTML = '';
+                if (data.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="3">Žádní uživatelé nebyli nalezeni</td>`;
+                    userTableBody.appendChild(row);
+                } else {
+                    data.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.name}</td>
+                            <td class="${user.credit < 0 ? 'negative-credit' : ''}">${user.credit} Kč</td>
+                            <td><button onclick="deleteUser('${user.rfid}')">Smazat</button></td>
+                        `;
+                        userTableBody.appendChild(row);
+                    });
+                }
+                clearRFIDInput();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                clearRFIDInput();
+            });
+        }
+
+        function showCoffeeDisplay() {
+            const coffeeDisplay = document.getElementById('coffeeDisplay');
+            coffeeDisplay.style.display = 'flex';
+
+            setTimeout(() => {
+                coffeeDisplay.style.display = 'none';
+            }, 10000);
+        }
+
+        function showCreditDisplay() {
+            const creditDisplay = document.getElementById('creditDisplay');
+            creditDisplay.style.display = 'flex';
+
+            setTimeout(() => {
+                creditDisplay.style.display = 'none';
+            }, 10000);
+        }
+    </script>
+</body>
+</html>

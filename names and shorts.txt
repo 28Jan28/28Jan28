@@ -1,0 +1,9 @@
+RFID	   zkratka   uživatel
+
+0010390011 - vjan - Jan Vydra
+0010390012 - blja - Jan Blažek
+0010390013 - vond - Ondřej Vozka
+0010390014 - amja - Jan Žambera
+0010390015 - heid - Michal Heidlas
+0010390016 - lusk - Martina Lusková
+
